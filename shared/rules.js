@@ -1,12 +1,53 @@
-// Constantes et opérations de match, communes au client et au serveur.
-export const RULES=Object.freeze({matchDuration:180,scoreToWin:10,itemRespawnDelay:5,maxPlayers:2,maxNicknameLength:20});
-export const ITEM_TYPES=Object.freeze({boost:Object.freeze({points:1,effect:'boost'}),star:Object.freeze({points:3,effect:'bonus'}),shield:Object.freeze({points:1,effect:'shield'}),magnet:Object.freeze({points:1,effect:'magnet'})});
-export function sanitizeInput(input={}){const clamp=v=>Math.max(-1,Math.min(1,v));const num=v=>Number.isFinite(v)?v:0;return{throttle:clamp(num(input.throttle)),steering:clamp(num(input.steering)),handbrake:Boolean(input.handbrake),useItem:Boolean(input.useItem)}}
-export function createPlayer(id,nickname,spawn={}){return{id:String(id),nickname:String(nickname??'Joueur').trim().slice(0,RULES.maxNicknameLength)||'Joueur',x:Number.isFinite(spawn.x)?spawn.x:0,z:Number.isFinite(spawn.z)?spawn.z:0,angle:Number.isFinite(spawn.angle)?spawn.angle:0,speed:0,score:0,itemsCollected:0,input:sanitizeInput(),connected:true}}
-export function createMatch(id,now=Date.now()){return{id:String(id),status:'waiting',createdAt:now,startedAt:null,endsAt:null,finishedAt:null,winnerId:null,players:[],items:[]}}
-export function addPlayer(match,player){if(match.status!=='waiting')return{ok:false,error:'match_already_started'};if(match.players.length>=RULES.maxPlayers)return{ok:false,error:'match_full'};if(match.players.some(p=>p.id===player.id))return{ok:false,error:'player_already_joined'};return{ok:true,match:{...match,players:[...match.players,player]}}}
-export function startMatch(match,now=Date.now()){if(match.status!=='waiting'||match.players.length!==RULES.maxPlayers)return{ok:false,error:'match_not_ready'};return{ok:true,match:{...match,status:'playing',startedAt:now,endsAt:now+RULES.matchDuration*1000}}}
-export function setPlayerInput(match,playerId,input){if(match.status!=='playing')return match;return{...match,players:match.players.map(p=>p.id===playerId?{...p,input:sanitizeInput(input)}:p)}}
-export function collectItem(match,playerId,itemId){if(match.status!=='playing')return{ok:false,error:'match_not_playing'};const item=match.items.find(i=>i.id===itemId&&i.available),player=match.players.find(p=>p.id===playerId);if(!item||!player)return{ok:false,error:'item_or_player_not_found'};const type=ITEM_TYPES[item.type];if(!type)return{ok:false,error:'unknown_item_type'};const next={...match,items:match.items.map(i=>i.id===itemId?{...i,available:false}:i),players:match.players.map(p=>p.id===playerId?{...p,score:p.score+type.points,itemsCollected:p.itemsCollected+1}:p)};return{ok:true,match:next.players.find(p=>p.id===playerId).score>=RULES.scoreToWin?finishMatch(next,playerId):next}}
-export function finishMatch(match,winnerId=null,now=Date.now()){if(match.status!=='playing')return match;return{...match,status:'finished',winnerId,finishedAt:now}}
-export function updateMatchClock(match,now=Date.now()){if(match.status!=='playing'||now<match.endsAt)return match;const[a,b]=match.players;return finishMatch(match,a.score===b.score?null:a.score>b.score?a.id:b.id,now)}
+// Règles communes du duel. La simulation locale et une future version réseau
+// peuvent s'appuyer sur ces données sans dépendre du rendu Three.js.
+export const WINNING_SCORE = 3;
+export const PLAYER_HEALTH = 100;
+export const BULLET_DAMAGE = 20;
+export const SHOT_COOLDOWN = 0.34;
+
+// Dimensions en unités monde et obstacles rectangulaires [x, z, largeur, profondeur, hauteur].
+export const ARENAS = [
+  {
+    id: 'neon-district', name: 'Néon District', width: 20, depth: 16,
+    floor: 0x202b40, wall: 0x303b53, cover: 0x485878, accent: 0x36d9f4,
+    obstacles: [[-4, -2.7, 3.4, 1.1, 1.45], [4, 2.7, 3.4, 1.1, 1.45], [-4.7, 3.3, 1.1, 2.8, 1.3], [4.7, -3.3, 1.1, 2.8, 1.3], [0, 0, 1.6, 1.6, 1.6]],
+  },
+  {
+    id: 'red-canyon', name: 'Canyon Rouge', width: 22, depth: 16,
+    floor: 0x382a32, wall: 0x60404a, cover: 0x96604e, accent: 0xff9868,
+    obstacles: [[-5.1, -3, 2.5, 1.4, 1.9], [5.1, 3, 2.5, 1.4, 1.9], [-3.7, 2.5, 1.25, 3.6, 1.35], [3.7, -2.5, 1.25, 3.6, 1.35], [0, 0, 2.4, 1.1, 1.25]],
+  },
+  {
+    id: 'zero-factory', name: 'Usine Zéro', width: 20, depth: 18,
+    floor: 0x25333a, wall: 0x34494e, cover: 0x4c6866, accent: 0x70efbd,
+    obstacles: [[-5.4, 0, 1.1, 5.1, 1.65], [5.4, 0, 1.1, 5.1, 1.65], [-2.3, -4, 3.4, 1.1, 1.35], [2.3, 4, 3.4, 1.1, 1.35], [0, 0, 1.2, 1.2, 1.8]],
+  },
+];
+
+export function createPlayerState() {
+  return { health: PLAYER_HEALTH, vx: 0, vz: 0, cooldown: 0, respawn: 0 };
+}
+
+export function createMatch(arenaIndex = 0) {
+  const safeIndex = Number.isInteger(arenaIndex) ? Math.max(0, Math.min(ARENAS.length - 1, arenaIndex)) : 0;
+  return { arenaIndex: safeIndex, scores: [0, 0], players: [createPlayerState(), createPlayerState()], finished: false };
+}
+
+export function damagePlayer(match, playerIndex, amount = BULLET_DAMAGE) {
+  if (!match || match.finished || !match.players[playerIndex] || !Number.isFinite(amount) || amount <= 0) return 0;
+  const player = match.players[playerIndex];
+  if (player.respawn > 0) return player.health;
+  player.health = Math.max(0, player.health - amount);
+  return player.health;
+}
+
+// Avance les chronomètres partagés. Le match n'a pas de limite de temps.
+export function stepMatch(match, deltaSeconds) {
+  if (!match || match.finished || !Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return match;
+  for (const player of match.players) {
+    player.cooldown = Math.max(0, player.cooldown - deltaSeconds);
+    player.respawn = Math.max(0, player.respawn - deltaSeconds);
+  }
+  match.finished = match.scores.some(score => score >= WINNING_SCORE);
+  return match;
+}
