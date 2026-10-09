@@ -1,263 +1,138 @@
-# 🚗 Bumper Arena - Vehicle Combat Edition
+# 🚗 VEHICLE ARENA
 
-Jeu web 3D compétitif 1v1 : deux véhicules armés se tirent dessus dans des arènes fermées avec obstacles.
+Un jeu web 3D arcade compétitif où deux véhicules cartoondesques se tirent dessus dans une arène fermée.
 
-## 🎮 Concept
+## 🎮 Gameplay
 
-- **Deux véhicules** se battent dans une arène fermée avec murs et couvertures.
-- **Combat jusqu'à la victoire** : premier à 3 éliminations gagne.
-- **Barre de vie réaliste** : les dégâts s'accumulent, le K.O. réinitialise la santé.
-- **Trois cartes** avec agencements de murs différents.
-- **Entièrement jouable au clavier** : aucune souris requise pendant le match.
-- **Mobile/Tablette** : joystick virtuel et bouton de tir tactiles.
-
----
+- **Mode Bot** : Jouer contre une IA (3 niveaux de difficulté)
+- **Mode Salon Privé** : Jouer en ligne contre un autre joueur (en développement)
+- **Caméra 3ème personne** : Vue dynamique suivant le véhicule du joueur
+- **Système de manches** : Premier à 3 points gagne le match
+- **Arènes multiples** : 3 cartes avec murs et couvertures différentes
 
 ## 🕹️ Contrôles
 
-### 🖥️ **Clavier (Desktop)**
-| Action | Touches |
-|--------|---------|
-| **Haut** | `W` ou `Z` |
-| **Bas** | `S` |
-| **Gauche** | `A` ou `Q` |
-| **Droite** | `D` |
-| **Tirer** | `Espace` |
+### Clavier (Bureau)
+- **Z / W** : Avancer
+- **S** : Reculer
+- **Q / A** : Aller à gauche
+- **D** : Aller à droite
+- **ESPACE** : Tirer
 
-### 📱 **Tactile (Mobile/Tablette)**
-- **Joystick gauche** : gestion du déplacement en 4 directions
-- **Gros bouton droit** : tirer
-- Les boutons apparaissent automatiquement sur écrans tactiles (< 768px)
+### Tactile (Téléphone / Tablette)
+- **Joystick gauche** : Déplacement 4 directions
+- **Bouton de tir (droite)** : Tirer
 
----
+## 📋 Modifications Récentes
 
-## 🚀 Installation et Lancement
+### ✅ Caméra 3ème Personne
+- Positionée derrière et au-dessus du véhicule
+- Suit dynamiquement le joueur
+- Meilleure perception de la profondeur
 
-### Prérequis
-- Node.js (LTS)
-- npm ou yarn
+### ✅ Suppression du Mode Local 2 Joueurs
+- Plus de "Joueur 1 vs Joueur 2" sur un clavier
+- Focus sur le Bot et le Multijoueur
 
-### Étapes
-```bash
-# 1. Cloner le dépôt
-git clone https://github.com/thomas-pns/bumper-arena.git
-cd bumper-arena
+### ✅ Mode Bot avec IA
+- **Facile** : Temps de réaction lent, tirs peu précis
+- **Moyen** : Équilibre bon / mauvais
+- **Difficile** : IA quasi-parfaite, réactions rapides
 
-# 2. Récupérer la branche vehicle-arena
-git checkout vehicle-arena
+### ✅ Contrôles Tactiles Améliorés
+- Joystick circulaire 4 directions
+- Bouton de tir circulaire large
+- Positionnés en bas de l'écran
+- Responsif pour téléphones ET tablettes
 
-# 3. Installer les dépendances
-npm install
+### ✅ Design Responsif
+- Adaptation automatique à tous les écrans
+- Menus agrandis sur mobile
+- Boutons tactiles bien espacés
+- Caméra figée sur desktop
 
-# 4. Lancer en développement
-npm run dev
+## 🏗️ Architecture
 
-# 5. Ouvrir dans le navigateur
-# http://localhost:5173
+```
+/client
+  /src
+    main.js       → Logique de jeu + 3D Three.js
+    style.css     → Styles + responsive design
+  index.html
+/server
+  (en développement)
+/shared
+  (logique partagée à venir)
+package.json
 ```
 
-### Build pour production
+## 🚀 Installation & Lancement
+
+### Pré-requis
+- Node.js >= 16
+- npm ou yarn
+
+### Développement Local
+
+```bash
+# Cloner la branche
+git clone -b vehicle-arena https://github.com/thomas-pns/bumper-arena.git
+cd bumper-arena
+
+# Installer dépendances
+npm install
+
+# Lancer le serveur de développement
+npm run dev
+```
+
+Ouvre `http://localhost:5173` dans le navigateur.
+
+## 📦 Build Production
+
 ```bash
 npm run build
 ```
 
----
+## 🎨 Caractéristiques Techniques
 
-## 🎨 Améliorations Principales
+- **Moteur 3D** : Three.js
+- **Physique** : Maison (collisions simple, mouvements fluides)
+- **Rendu** : MeshStandardMaterial avec ombres
+- **Caméra** : Perspective 3ème personne avec lerp
+- **Responsive** : Adapté mobile/tablette/desktop
 
-### 1️⃣ **Physique Fluide**
-✅ Accélération/décélération progressive (pas de vitesse instantanée)
-✅ Friction réaliste avec système de damping
-✅ Glissement le long des murs au lieu de blocage net
-✅ Rotation lissée du véhicule vers sa direction
-✅ Collisions élastiques entre véhicules
+## 🔄 Prochaines Étapes
 
-**Fichier** : `shared/physics.js`
+1. **Mode Salon Privé** (WebSocket)
+   - Code à 5 caractères pour rejoindre
+   - Synchronisation temps réel serveur
 
-### 2️⃣ **Rendu 3D Enrichi**
-✅ Éclairage avancé :
-  - Lumière hémisphérique douce
-  - Soleil directionnel avec ombres portées
-  - Lumière ambiante pour profondeur
-✅ Matériaux toon stylisés (metalness, roughness)
-✅ Véhicules détaillés : corps, tourelle, canon, roues, yeux
-✅ Particules de tir et d'impact
-✅ Fond en dégradé avec brume (fog) pour profondeur
-✅ Texture du sol quadrillée
+2. **Bonus & Power-ups**
+   - Bouclier temporaire
+   - Tir puissant
+   - Réparation
+   - Accélération
 
-**Fichier** : `client/src/main.js` (classe `Vehicle` et fonctions de rendu)
+3. **Système de Classement**
+   - Comptes utilisateurs
+   - ELO ranking
+   - Top 50 global
 
-### 3️⃣ **Responsive Mobile/Tablette**
-✅ Joystick virtuel adaptatif (s'affiche seulement sur écran tactile)
-✅ Bouton de tir tactile grand et facile à toucher
-✅ Zones de sécurité iPhone notch (`safe-area-inset`)
-✅ Media queries optimisées (portrait/paysage, petit/grand écran)
-✅ Textes redimensionnés avec `clamp()` (min, préféré, max)
-✅ Pixels ratio adapté aux écrans haute densité
-✅ Canvas responsive via `requestAnimationFrame` + resize handler
+4. **Améliorations Visuelles**
+   - Particules à l'impact
+   - Effets visuels des tirs
+   - Meilleure détection des obstacles
 
-**Fichier** : `client/src/style.css`
+## 🐛 Problèmes Connus
 
----
+- Aucun pour l'instant (rapporter les bugs sur GitHub Issues)
 
-## 📊 Architecture
+## 📝 Licences des Assets
 
-```
-bumper-arena/
-├── client/
-│   ├── src/
-│   │   ├── main.js          (boucle principale, rendus, joystick)
-│   │   ├── maps.js          (définition des cartes)
-│   │   ├── style.css        (UI + responsive)
-│   │   └── index.html
-│   └── ...
-├── shared/
-│   ├── physics.js           (moteur physique partagé)
-│   └── rules.js             (règles du jeu)
-├── vite.config.js
-├── package.json
-└── README.md
-```
+- **Three.js** : MIT
+- **Fredoka Font** : Open Font License
 
-### Flux de Données
-1. **Input** → Clavier ou joystick tactile
-2. **Physique** → `updateVehiclePhysics()` + collisions
-3. **État du jeu** → scores, santé, projectiles
-4. **Rendu** → Three.js camera + meshes
-5. **Loop** → `requestAnimationFrame` ≈ 60 FPS
+## 👤 Auteur
 
----
-
-## 🎯 Gameplay
-
-### Objets
-
-| Élément | Descriptif |
-|---------|-----------|
-| **Véhicule** | Boîte 3D avec tourelle, canon et roues |
-| **Projectile** | Sphère orangée qui inflige 10 dégâts |
-| **Mur** | Obstacle bloquant (gris/marron) |
-| **Sol** | Plateforme verte quadrillée |
-
-### Mécanique
-
-1. **Déplacement** : 4 directions fluides avec friction
-2. **Tir** : visée automatique vers l'avant du véhicule
-3. **Dégâts** : chaque impact enlève 10 PV (max 100)
-4. **K.O.** : à 0 PV, réapparition après 1 sec, score +1
-5. **Victoire** : premier à 3 éliminations gagne
-
-### Cartes (3)
-
-- **Carte 1** : Arène simple, murs centraux
-- **Carte 2** : Labyrinth avec couloirs et couvertures
-- **Carte 3** : Multiple îlots et obstacles circulaires
-
----
-
-## 🐛 Optimisations Perf
-
-- **Pixel ratio limité** à 2 (évite surcharge GPU)
-- **Ombres activées** mais optimisées (PCFShadowMap)
-- **Fog** pour réduire la portée de rendu
-- **WebGL toneMappingExposure** ajusté pour performance
-- **Interpolation caméra** lissée (lerp factor 0.08)
-- **Particules limitées** et supprimées après expiration
-
-**FPS cible** : 60 FPS sur laptop moyen
-
----
-
-## 📱 Support Mobile
-
-| Appareil | Statut |
-|----------|--------|
-| iOS (Safari) | ✅ Joystick + bouton de tir |
-| Android (Chrome) | ✅ Joystick + bouton de tir |
-| iPad (Landscape) | ✅ Clavier USB + souris optionnelle |
-| Notch/Encoche | ✅ `safe-area-inset` appliqué |
-
-### Notes
-- Le joystick n'apparaît QUE sur écrans tactiles (< 768px)
-- Sur desktop, clavier uniquement (plus rapide)
-- Le canvas s'adapte à la rotation écran et au redimensionnement
-
----
-
-## 🔧 Dépendances
-
-```json
-{
-  "dependencies": {
-    "three": "latest"
-  },
-  "devDependencies": {
-    "vite": "latest"
-  }
-}
-```
-
----
-
-## 🎵 Sons et Musique
-
-🔊 **À ajouter dans les prochaines étapes**
-- Effets : tir, impact, K.O., réapparition
-- Musique d'ambiance (boucle)
-- Réglages mute/volume (localStorage)
-
----
-
-## 🌐 Modes de Jeu (Roadmap)
-
-| Mode | État | Déscription |
-|------|------|-----------|
-| **Local** | ✅ Fait | 2 joueurs, 1 clavier |
-| **Bot** | 🔜 Prévu | IA 3 niveaux |
-| **En ligne** | 🔜 Prévu | Multijoueur WebSocket + Matchmaking |
-| **Classement** | 🔜 Prévu | Système ELO + leaderboard |
-
----
-
-## 📝 Notes de Développement
-
-### Physique
-- Les murs sont définis comme segments `[x1, y1, x2, y2]` dans `maps.js`
-- Collisions résolues par projection du véhicule perpendiculaire + friction de glissement
-- Vitesse maximale limitée à 15 m/s
-
-### Rendu
-- Caméra suit la moyenne des deux véhicules (lerp lissé)
-- Meshes actualisés à chaque frame
-- Ombres portées en temps réel (peut être expensive sur mobile)
-
-### Mobile
-- `clamp(min, préféré, max)` pour scalabilité
-- `safe-area-inset` pour notch iPhone/Android
-- Touch events non-bubbling (stop propagation)
-- Pixel ratio vérifié et limité
-
----
-
-## 🤝 Contribuer
-
-Les contributions sont bienvenues ! Ouvre une issue ou propose une PR.
-
----
-
-## 📜 Licence
-
-Projet étudiant, open-source.  
-Three.js : [MIT](https://github.com/mrdoob/three.js/blob/dev/LICENSE)  
-Vite : [MIT](https://github.com/vitejs/vite/blob/main/LICENSE)
-
----
-
-## 🎓 Crédits
-
-**Développement** : Branche `vehicle-arena`  
-**Concept** : Arènes fermées, combat véhicules, responsive tactile
-
----
-
-**Prêt à jouer ?** → `npm run dev` 🚗💨
+Thomas Chassanis Pons (thomas-pns)
