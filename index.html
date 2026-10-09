@@ -3,23 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#101827" />
-    <title>Bumper Arena</title>
+    <meta name="theme-color" content="#101627" />
+    <meta name="description" content="Bumper Arena — duel de véhicules en arène 3D." />
+    <title>Bumper Arena — Duel en arène</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <main class="game-shell">
-      <header class="topbar">
-        <div><p class="eyebrow">ARCADE · MODE LOCAL</p><h1>Bumper Arena</h1></div>
-        <div class="scoreboard"><span>Objets ramassés</span><strong id="score">0</strong></div>
-      </header>
-      <section class="game-frame" aria-label="Arène Bumper Arena">
-        <canvas id="game" aria-label="Arène 3D"></canvas>
-        <div id="overlay" class="overlay">
-          <div class="overlay-card"><p class="eyebrow">PRÊT À JOUER ?</p><h2 id="overlay-title">Échappe à l’adversaire</h2><p id="overlay-copy">Conduis, dash et ramasse les étoiles. Ne te laisse pas rattraper !</p><button id="start-button" type="button">Jouer</button></div>
-        </div>
-      </section>
-      <footer class="controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou flèches : conduire</span><span><kbd>Espace</kbd> : dash</span><span><kbd>R</kbd> : recommencer</span></footer>
-    </main>
+    <div id="app"></div>
     <script type="module" src="/client/src/main.js"></script>
   </body>
 </html>
