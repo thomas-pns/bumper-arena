@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101827" />
+    <title>Bumper Arena</title>
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="topbar">
+        <div><p class="eyebrow">ARCADE · MODE LOCAL</p><h1>Bumper Arena</h1></div>
+        <div class="scoreboard"><span>Objets ramassés</span><strong id="score">0</strong></div>
+      </header>
+      <section class="game-frame" aria-label="Arène Bumper Arena">
+        <canvas id="game" aria-label="Arène 3D"></canvas>
+        <div id="overlay" class="overlay">
+          <div class="overlay-card"><p class="eyebrow">PRÊT À JOUER ?</p><h2 id="overlay-title">Échappe à l’adversaire</h2><p id="overlay-copy">Conduis, dash et ramasse les étoiles. Ne te laisse pas rattraper !</p><button id="start-button" type="button">Jouer</button></div>
+        </div>
+      </section>
+      <footer class="controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou flèches : conduire</span><span><kbd>Espace</kbd> : dash</span><span><kbd>R</kbd> : recommencer</span></footer>
+    </main>
+    <script type="module" src="/client/src/main.js"></script>
+  </body>
+</html>
